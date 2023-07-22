@@ -23,6 +23,7 @@ public class JDBC_repository {
             new MyThread(url, userName, password, i * 100000).run();
             Thread.sleep(1);
         }
+        System.out.println("-----[End DB]-----");
     }
 
     public static void main(String[] args) throws ClassNotFoundException, InterruptedException {
@@ -71,7 +72,7 @@ public class JDBC_repository {
                 sb.append("INSERT INTO BOARD(BOARD_ID, TITLE, CONTENT, REGDATE, USER_ID, HIT)VALUE(?,?,?,?,?,?)");
                 stat = conn.prepareStatement(sb.toString());
 
-                for (int i = 1; i <= 100000; i++) {
+                for (int i = 1; i <= 10000; i++) {
                     stat.setLong(1, startNum + i);
                     stat.setString(2, "테스트");
                     stat.setString(3, "테스트내용");
