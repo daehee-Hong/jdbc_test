@@ -20,7 +20,8 @@ public class JDBC_repository {
     public void start() throws ClassNotFoundException, InterruptedException {
         Class.forName(driver);
         for (int i = 1; i <= 5; i++) {
-            new MyThread(url, userName, password, i * 100000).run();
+            Runnable myThread = new MyThread(url, userName, password, i * 1000000);
+            new Thread(myThread).start();
             Thread.sleep(1);
         }
         System.out.println("-----[End DB]-----");
@@ -56,7 +57,7 @@ public class JDBC_repository {
         }
 
         @Override
-        synchronized public void run() {
+        public void run() {
             Connection conn = null;
             try {
                 conn = DriverManager.getConnection(url, userName, password);
@@ -67,12 +68,12 @@ public class JDBC_repository {
             PreparedStatement stat = null;
             ResultSet rs = null;
             try {
-
+                System.out.println(startNum);
                 StringBuffer sb = new StringBuffer();
                 sb.append("INSERT INTO BOARD(BOARD_ID, TITLE, CONTENT, REGDATE, USER_ID, HIT)VALUE(?,?,?,?,?,?)");
                 stat = conn.prepareStatement(sb.toString());
 
-                for (int i = 1; i <= 10000; i++) {
+                for (int i = 1; i <= 100000; i++) {
                     stat.setLong(1, startNum + i);
                     stat.setString(2, "테스트");
                     stat.setString(3, "테스트내용");
@@ -95,9 +96,9 @@ public class JDBC_repository {
             } catch (SQLException e){
                 e.printStackTrace();
             }finally {
-                if (conn != null) {try {conn.close();}catch (SQLException e){}}
-                if (stat != null) {try {stat.close();}catch (SQLException e){}}
                 if (rs != null) {try {rs.close();}catch (SQLException e){}}
+                if (stat != null) {try {stat.close();}catch (SQLException e){}}
+                if (conn != null) {try {conn.close();}catch (SQLException e){}}
             }
         }
     }
