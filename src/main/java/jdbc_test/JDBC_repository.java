@@ -20,7 +20,7 @@ public class JDBC_repository {
     public void start() throws ClassNotFoundException, InterruptedException {
         Class.forName(driver);
         for (int i = 1; i <= 10; i++) {
-            Runnable myThread = new MyThread(url, userName, password, i * 1000000);
+            Runnable myThread = new MyThread(url, userName, password, i * 100000);
             new Thread(myThread).start();
             Thread.sleep(1);
         }
@@ -59,21 +59,18 @@ public class JDBC_repository {
         @Override
         public void run() {
             Connection conn = null;
-            try {
-                conn = DriverManager.getConnection(url, userName, password);
-                conn.setAutoCommit(false);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
             PreparedStatement stat = null;
             ResultSet rs = null;
             try {
+                conn = DriverManager.getConnection(url, userName, password);
+                conn.setAutoCommit(false);
+
                 System.out.println(startNum);
                 StringBuffer sb = new StringBuffer();
                 sb.append("INSERT INTO BOARD(BOARD_ID, TITLE, CONTENT, REGDATE, USER_ID, HIT)VALUE(?,?,?,?,?,?)");
                 stat = conn.prepareStatement(sb.toString());
 
-                for (int i = 1; i <= 100000; i++) {
+                for (int i = 1; i <= 10000; i++) {
                     stat.setLong(1, startNum + i);
                     stat.setString(2, "테스트");
                     stat.setString(3, "테스트내용");
