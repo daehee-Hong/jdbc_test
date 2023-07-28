@@ -19,7 +19,7 @@ public class JDBC_repository {
     }
     public void start() throws ClassNotFoundException, InterruptedException {
         Class.forName(driver);
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 10; i++) {
             Runnable myThread = new MyThread(url, userName, password, i * 1000000);
             new Thread(myThread).start();
             Thread.sleep(1);
