@@ -1,26 +1,16 @@
 package jdbc_test;
 
+import connection_pool.ConnectionPool;
+
+import javax.sql.DataSource;
 import java.sql.*;
 
 public class JDBC_repository {
-
-    private String driver;
-    private String url;
-    private String userName;
-    private String password;
-
     static long beforeTime;
 
-    JDBC_repository(String driver, String url, String userName, String password) {
-        this.driver = driver;
-        this.url = url;
-        this.userName = userName;
-        this.password = password;
-    }
-    public void start() throws ClassNotFoundException, InterruptedException {
-        Class.forName(driver);
+    public void start() throws InterruptedException {
         for (int i = 1; i <= 10; i++) {
-            Runnable myThread = new MyThread(url, userName, password, i * 100000);
+            Runnable myThread = new MyThread(i * 100000);
             new Thread(myThread).start();
             Thread.sleep(1);
         }
@@ -31,29 +21,17 @@ public class JDBC_repository {
         System.out.println("-----[Start DB]-----");
         beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
 
-        JDBC_repository jdbc_repository = new JDBC_repository(
-                "com.mysql.cj.jdbc.Driver"
-                ,"jdbc:mysql://@localhost:3306/spring_security_test_db"
-                ,"root"
-                ,"1234"
-        );
-
+        JDBC_repository jdbc_repository = new JDBC_repository();
         jdbc_repository.start();
     }
 
     public static class MyThread implements Runnable {
-
-        private String url;
-        private String userName;
-        private String password;
-
+        private DataSource dataSource;
         private int startNum;
 
-        MyThread(String url, String userName, String password, int startNum){
-            this.url = url;
-            this.userName = userName;
-            this.password = password;
+        MyThread(int startNum){
             this.startNum = startNum;
+            this.dataSource = ConnectionPool.getDataSource();
         }
 
         @Override
@@ -62,7 +40,7 @@ public class JDBC_repository {
             PreparedStatement stat = null;
             ResultSet rs = null;
             try {
-                conn = DriverManager.getConnection(url, userName, password);
+                conn = dataSource.getConnection();
                 conn.setAutoCommit(false);
 
                 System.out.println(startNum);
